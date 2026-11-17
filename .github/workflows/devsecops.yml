@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Recuperer le code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Dependances
         run: |
           docker run --rm -v "$PWD":/project aquasec/trivy:latest fs \
@@ -17,7 +17,7 @@ jobs:
     needs: Dependances
     steps:
       - name: Recuperer le code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Test Dockerfile
         run: |
           docker run --rm -v "$PWD":/project aquasec/trivy:latest config \
