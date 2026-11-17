@@ -23,10 +23,37 @@ jobs:
           docker run --rm -v "$PWD":/project aquasec/trivy:latest config \
             --severity HIGH,CRITICAL --exit-code 1 /project
 
-  Deploy:
+  Image:
     runs-on: ubuntu-24.04
     needs: Dockerfile
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/xupaki/breakableflask
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v5
+      - name: Construction de l'image
+        run: |
+          docker build \
+            --label org.opencontainers.image.source=https://github.com/${{ github.repository }} \
+            -t $IMAGE:${{ github.sha }} -t $IMAGE:latest .
+      - name: Scan de l'image
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image --severity HIGH,CRITICAL \
+            --ignore-unfixed --exit-code 1 $IMAGE:${{ github.sha }}
+      - name: Publication de l'image (GHCR)
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push $IMAGE:${{ github.sha }}
+          docker push $IMAGE:latest
+
+  Deploy:
+    runs-on: ubuntu-24.04
+    needs: Image
     steps:
       - name: Deploy
         run: |
-          echo "Rien à faire ici. Votre application est prête à être déployée"
+          echo "Image ghcr.io/xupaki/breakableflask prete a etre deployee"
