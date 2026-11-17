@@ -2,7 +2,7 @@ name: Automatisation des tests DevSecOps
 on: push
 jobs:
   Dependances:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Recuperer le code
         uses: actions/checkout@v5
@@ -13,7 +13,7 @@ jobs:
             /project/requirements.txt
 
   Dockerfile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: Dependances
     steps:
       - name: Recuperer le code
@@ -24,7 +24,7 @@ jobs:
             --severity HIGH,CRITICAL --exit-code 1 /project
 
   Deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: Dockerfile
     steps:
       - name: Deploy
